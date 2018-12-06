@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+
+    <title>😜Emojitalk</title>
+</head>
+
+<body class="has-navbar-fixed-top has-navbar-fixed-bottom">
+    <!-- Navbar -->
+    <nav id="mainNav" class="navbar is-fixed-top is-warning" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="index.html">
+                <h2>Emojitalk😜</h2>
+            </a>
+
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item">
+                    Feed
+                </a>
+
+                <a class="navbar-item">
+                    About
+                </a>
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a id="btnRegister" class="button is-primary">
+                            <strong>Sign up</strong>
+                        </a>
+                        <a id="btnLogin" class="button is-light">
+                            Log in
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Sign up</p>
+                <button class="delete exitmodal" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="field">
+                    <label class="label" for="regUsername">Username</label>
+                    <div class="control has-icons-left">
+                        <input id="regUsername" class="input" type="text">
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-user"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="regEmail">Email</label>
+                    <div class="control has-icons-left">
+                        <input id="regEmail" class="input" type="email">
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="regPassword">Password</label>
+                    <div class="control has-icons-left">
+                        <input id="regPassword" class="input" type="password">
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-key"></i>
+                        </span>
+                    </div>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success">Sign up!</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Log in</p>
+                <button class="delete exitmodal" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="field">
+                    <label class="label" for="logUsername">Username</label>
+                    <div class="control has-icons-left">
+                        <input id="logUsername" class="input" type="text">
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-user"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label" for="logPassword">Password</label>
+                    <div class="control has-icons-left">
+                        <input id="logPassword" class="input" type="password">
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-key"></i>
+                        </span>
+                    </div>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success">Login</button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Main Section -->
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-hidden-mobile"></div>
+
+                <div class="column is-half">
+
+                    <!-- Post -->
+                    <div class="card">
+                        <header class="card-header">
+                            <p class="card-header-title">
+                                User
+                            </p>
+                        </header>
+                        <div class="card-content">
+                            <div class="content">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.
+                                <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <a href="#" class="card-footer-item">❤️</a>
+                            <a href="#" class="card-footer-item">Delete</a>
+                        </footer>
+                    </div>
+
+                    <!-- Emoji Input -->
+                    <div class="field has-addons">
+                        <div class="control">
+                            <label class="input">Test</label>
+                        </div>
+                        <p class="control">
+                            emojikeyboard toggle something
+                        </p>
+                        <div class="control">
+                            <a class="button is-primary">
+                                Post
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="column is-hidden-mobile"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <nav class="navbar is-fixed-bottom is-success">
+        <div class="navbar-menu is-active level">
+            <!-- <div id="createPost" class="dropdown is-up level-item has-text-centered">
+                <div class="dropdown-trigger">
+                    <button id="btnCreatePost" class="button" aria-haspopup="true">
+                        <span>Create Post</span>
+                    </button>
+                </div>
+                <div class="dropdown-menu is-overlay">
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <div class="card">
+                                <header class="card-header">
+                                    <p class="card-header-title">
+                                        User
+                                    </p>
+                                </header>
+                                <div class="card-content">
+                                    <div class="content">
+                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis
+                                        mauris.
+                                        <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                                    </div>
+                                </div>
+                                <footer class="card-footer">
+                                    <a href="#" class="card-footer-item">❤️</a>
+                                    <a href="#" class="card-footer-item">Delete</a>
+                                </footer>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+            <div id="createPost" class="dropdown is-up level-item has-text-centered">
+                <button id="btnCreatePost" class="button is-primary">Create Post</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Javascript -->
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
