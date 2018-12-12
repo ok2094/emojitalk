@@ -24,7 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         // benutzername vorhanden, mindestens 6 Zeichen und maximal 30 zeichen lang
         if(isset($_POST['rUsername']) && !empty(trim($_POST['rUsername'])) && strlen(trim($_POST['rUsername'])) <= 30){
             $rUsername = trim($_POST['rUsername']);
-            // entspricht der benutzername unseren vogaben (minimal 6 Zeichen, Gross- und Kleinbuchstaben
         } else {
             // Ausgabe Fehlermeldung
             $error .= "Geben Sie bitte einen korrekten Benutzernamen ein.<br />";
@@ -39,12 +38,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $error .= "Geben Sie bitte einen korrekten Nachnamen ein.<br />";
         }
 
+        echo($rEmail . ' ' . $rPassword . ' ' . $rUsername);
         // wenn kein Fehler vorhanden ist, schreiben der Daten in die Datenbank
         if(empty($error)){
             $rPassword = password_hash($rPassword, PASSWORD_DEFAULT);
             $query = "INSERT INTO user (role, username, password, email) VALUES (?,?,?,?)";
             $stmt = $mysqli->prepare($query);
-            $stmt->bind_param("ssss", '1', $rUsername, $rPassword, $rEmail);
+            $stmt->bind_param("isss", $rRole = 1, $rUsername, $rPassword, $rEmail);
             $stmt->execute();
             $stmt->close();
             //header("Location: /login.php");
@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <!-- Navbar -->
     <nav id="mainNav" class="navbar is-fixed-top is-warning" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item" href="index.html">
+            <a class="navbar-item" href="index.php">
                 <h2>Emojitalk😜</h2>
             </a>
 
@@ -146,6 +146,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                         <a id="btnLogin" class="button is-light">
                             Log in
                         </a>
+                        <a id="btnLogin" href="controllers/logout.php" class="button is-light">
+                            Log out
+                        </a>
                     </div>
                 </div>
             </div>
@@ -156,6 +159,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <div id="registerModal" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
+        <form action="index.php" method="post">
             <header class="modal-card-head">
                 <p class="modal-card-title">Sign up</p>
                 <button class="delete exitmodal" aria-label="close"></button>
@@ -194,6 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             <footer class="modal-card-foot">
                 <button name="register" type="submit" class="button is-success">Sign up!</button>
             </footer>
+        </form>
         </div>
     </div>
 
@@ -201,6 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <div id="loginModal" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
+        <form action="index.php" method="post">
             <header class="modal-card-head">
                 <p class="modal-card-title">Log in</p>
                 <button class="delete exitmodal" aria-label="close"></button>
@@ -229,6 +235,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             <footer class="modal-card-foot">
                 <button name="login" type="submit" class="button is-success">Login</button>
             </footer>
+        </form>
         </div>
     </div>
 
