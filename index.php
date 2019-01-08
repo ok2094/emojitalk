@@ -7,6 +7,7 @@ $message = '';
 
 // Formular wurde gesendet und Besucher ist noch nicht angemeldet.
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
+    echo "<script type='text/javascript'>alert('?');</script>";
 
     if(isset($_POST["register"])){
 
@@ -50,10 +51,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             //header("Location: /login.php");
         }
     } else if(isset($_POST["login"])){
+        echo "<script type='text/javascript'>alert('dostuff');</script>";
         // username
-        if(!empty(trim($_POST['username']))){
+        if(!empty(trim($_POST['logUsername']))){
 
-            $username = trim($_POST['username']);
+            $username = trim($_POST['logUsername']);
             
             // prüfung benutzername
             
@@ -61,8 +63,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $error .= "Geben Sie bitte den Benutzername an.<br />";
         }
         // password
-        if(!empty(trim($_POST['password']))){
-            $password = trim($_POST['password']);
+        if(!empty(trim($_POST['logPassword']))){
+            $password = trim($_POST['logPassword']);
             // passwort gültig?
             
         } else {
@@ -85,9 +87,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                         session_start();
                         $_SESSION['login'] = true;
                         $_SESSION['username'] = $row['username'];
+                        header("Location: /index.php");
+                        echo "<script type='text/javascript'>alert('login');</script>";
                     }
                     else{
-                        echo"shit";
+                        echo "<script type='text/javascript'>alert('idk');</script>";
                     }
                 }
             }
@@ -97,9 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             // header("Location: /index.php");
         }
     }
-	
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -111,6 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+    <link rel="stylesheet" href="stylesheets/main.css">
 
     <title>😜Emojitalk</title>
 </head>
@@ -140,15 +143,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             <div class="navbar-end">
                 <div class="navbar-item">
                     <div class="buttons">
+                        <?php
+                        if (!$_SESSION['login']) {
+                        ?>
                         <a id="btnRegister" class="button is-primary">
                             <strong>Sign up</strong>
                         </a>
                         <a id="btnLogin" class="button is-light">
                             Log in
                         </a>
-                        <a id="btnLogin" href="controllers/logout.php" class="button is-light">
+                        <?php
+                        } else {
+                        ?>
+                        <a href="controllers/logout.php" class="button is-light">
                             Log out
                         </a>
+                        <?php
+                        }
+                        ?>
                     </div>
                 </div>
             </div>
@@ -159,7 +171,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <div id="registerModal" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
-        <form action="index.php" method="post">
+        <form name="registerForm" method="post">
             <header class="modal-card-head">
                 <p class="modal-card-title">Sign up</p>
                 <button class="delete exitmodal" aria-label="close"></button>
@@ -206,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <div id="loginModal" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
-        <form action="index.php" method="post">
+        <form name="loginForm" method="post">
             <header class="modal-card-head">
                 <p class="modal-card-title">Log in</p>
                 <button class="delete exitmodal" aria-label="close"></button>
@@ -215,7 +227,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="field">
                     <label class="label" for="logUsername">Username</label>
                     <div class="control has-icons-left">
-                        <input name="username" id="logUsername" class="input" type="text">
+                        <input name="logUsername" id="logUsername" class="input" type="text">
                         <span class="icon is-small is-left">
                             <i class="fas fa-user"></i>
                         </span>
@@ -225,7 +237,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="field">
                     <label class="label" for="logPassword">Password</label>
                     <div class="control has-icons-left">
-                        <input name="password" id="logPassword" class="input" type="password">
+                        <input name="logPassword" id="logPassword" class="input" type="password">
                         <span class="icon is-small is-left">
                             <i class="fas fa-key"></i>
                         </span>
@@ -239,6 +251,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
     </div>
 
+
+    <?php
+    if ($_SESSION['login']) {
+    ?>
+    <!-- Post Modal -->
+    <div id="postModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+        <form name="postForm" method="post">
+            <header class="modal-card-head">
+                <label class="input emojiinput"></label>
+                <button class="delete exitmodal" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="field">
+                    <div class="emojipicker"></div>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button name="createPost" type="submit" class="button is-success">Submit</button>
+            </footer>
+        </form>
+        </div>
+    </div>
+    <?php
+    }
+    ?>
+
     <!-- Main Section -->
     <section class="section">
         <div class="container">
@@ -247,6 +287,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
                 <div class="column is-half">
 
+                    <?php
+
+                    ?>
                     <!-- Post -->
                     <div class="card">
                         <header class="card-header">
@@ -289,40 +332,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <!-- Footer -->
     <nav class="navbar is-fixed-bottom is-success">
         <div class="navbar-menu is-active level">
-            <!-- <div id="createPost" class="dropdown is-up level-item has-text-centered">
-                <div class="dropdown-trigger">
-                    <button id="btnCreatePost" class="button" aria-haspopup="true">
-                        <span>Create Post</span>
-                    </button>
-                </div>
-                <div class="dropdown-menu is-overlay">
-                    <div class="dropdown-content">
-                        <div class="dropdown-item">
-                            <div class="card">
-                                <header class="card-header">
-                                    <p class="card-header-title">
-                                        User
-                                    </p>
-                                </header>
-                                <div class="card-content">
-                                    <div class="content">
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis
-                                        mauris.
-                                        <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
-                                    </div>
-                                </div>
-                                <footer class="card-footer">
-                                    <a href="#" class="card-footer-item">❤️</a>
-                                    <a href="#" class="card-footer-item">Delete</a>
-                                </footer>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
+        <?php
+        if ($_SESSION['login']) {
+        ?>
             <div id="createPost" class="dropdown is-up level-item has-text-centered">
                 <button id="btnCreatePost" class="button is-primary">Create Post</button>
             </div>
+        <?php
+        }
+        ?>
         </div>
     </nav>
 
