@@ -4,7 +4,6 @@ session_start();
 
 $error = '';
 
-// Formular wurde gesendet und Besucher ist noch nicht angemeldet.
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     //SIGN UP
@@ -21,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
         // benutzername check
         if(isset($_POST['rUsername']) && !empty(trim($_POST['rUsername'])) && strlen(trim($_POST['rUsername'])) <= 30 && strlen(trim($_POST['rUsername'])) >= 3){
-            $rUsername = trim($_POST['rUsername']);
+            $rUsername = htmlspecialchars(trim($_POST['rUsername']));
         } else {
             $error .= "Please enter a valid username";
         }
@@ -51,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     if(isset($_POST["login"])){
         // username
         if(!empty(trim($_POST['logUsername']))){
-            $username = trim($_POST['logUsername']);
+            $username = htmlspecialchars(trim($_POST['logUsername']));
         } else {
             $error .= "Please enter a username";
         }
@@ -79,6 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                         $_SESSION['login'] = true;
                         $_SESSION['userid'] = $row['id'];
                         $_SESSION['userrole'] = $row['role'];
+                        session_regenerate_id();
                     }
                     else{
                         $error .= "Password wrong";
@@ -94,9 +94,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     //CREATE POST
     if(isset($_POST["createPost"])){
         if(isset($_POST['content']) && !empty(trim($_POST['content'])) && strlen(trim($_POST['content'])) <= 20){
-            $content = trim($_POST['content']);
+            $content = htmlspecialchars(trim($_POST['content']));
         } else {
-            $error .= "Please enter an emoji";
+            $error .= "Please review your input";
         }
 
         // wenn kein Fehler vorhanden ist, schreiben der Daten in die Datenbank
@@ -109,6 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
 
+    //CHANGE PASSWORD
     if(isset($_POST["changePwd"])){
         if(isset($_POST['oldPwd']) && !empty(trim($_POST['oldPwd'])) && strlen(trim($_POST['oldPwd'])) <= 200){
             $oldPwd = trim($_POST['oldPwd']);
@@ -123,6 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 while($row = $result->fetch_assoc()){
                     if(password_verify($oldPwd, $row['password'])){
                         if(isset($_POST['newPwd']) && !empty(trim($_POST['newPwd'])) && strlen(trim($_POST['newPwd'])) >= 8 && strlen(trim($_POST['newPwd'])) <= 200){
+                            // neues passwort setzen
                             $newPwd = trim($_POST['newPwd']);
                             $newPwd = password_hash($newPwd, PASSWORD_DEFAULT);
                             $query = "UPDATE user SET password = ? WHERE id = ?";
@@ -145,6 +147,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         } else {
             $error .= "Please enter your current password";
         }
+
+        session_regenerate_id();
     }
 
     //ERROR MESSAGE
@@ -173,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <nav id="mainNav" class="navbar is-fixed-top is-warning" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="index.php">
-                <h2><strong>Emojitalk😜</strong></h2>
+                <img src="assets\img\logo.png" alt="Emojitalk😜" title="Emojitalk😜">
             </a>
 
             <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -338,13 +342,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
     </div>
 
+    <?php
+    if (isset($_SESSION['login'])) {
+    ?>
     <!-- Post Modal -->
     <div id="postModal" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
         <form name="postForm" method="post">
             <header class="modal-card-head">
-                <input name="content" pattern="[^a-zA-Z0-9 @.,_+-?!]*" maxlength="20" class="input emojiinput"></input>
+                <input name="content" pattern="[^a-zA-Z0-9 @.,_+-?!]*" maxlength="20" class="input is-rounded emojiinput"></input>
             </header>
             <section class="modal-card-body">
                 <div class="field">
@@ -357,6 +364,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         </form>
         </div>
     </div>
+    <?php
+    }
+    ?>
 
     <!-- Main Section -->
     <section class="section">
