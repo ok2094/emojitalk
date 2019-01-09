@@ -265,7 +265,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         <form name="registerForm" method="post">
             <header class="modal-card-head">
                 <p class="modal-card-title">Sign up</p>
-                <button class="delete exitmodal" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
                 <div class="field">
@@ -312,7 +311,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         <form name="loginForm" method="post">
             <header class="modal-card-head">
                 <p class="modal-card-title">Log in</p>
-                <button class="delete exitmodal" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
                 <div class="field">
