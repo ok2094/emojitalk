@@ -109,6 +109,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         }
     }
 
+    //DELETE POST
+    if(isset($_POST["deletePost"])){
+        if(isset($_POST['deleteId']) && !empty(trim($_POST['deleteId']))){
+            $deleteId = trim($_POST['deleteId']);
+            $query = "SELECT * from post where id = ?";
+            $stmt = $mysqli->prepare($query);
+            $stmt->bind_param("i", $deleteId);
+            $stmt->execute();
+            $result=$stmt->get_result();
+            if($result->num_rows === 0) {
+                $error .= "Post not found";
+            } else {
+                while($row = $result->fetch_assoc()){ 
+                    if($row['created_by'] == $_SESSION['userid']) {
+                        $query = "DELETE FROM post WHERE id = ?";
+                        $stmt = $mysqli->prepare($query);
+                        $stmt->bind_param("i", $deleteId);
+                        $stmt->execute();
+                        $stmt->close();
+                    } else {
+                        $error .= "You don't have sufficient rights to delete this post";
+                    }
+                }
+            }
+            $result->free();
+        }
+    }
+
     //CHANGE PASSWORD
     if(isset($_POST["changePwd"])){
         if(isset($_POST['oldPwd']) && !empty(trim($_POST['oldPwd'])) && strlen(trim($_POST['oldPwd'])) <= 200){
@@ -377,7 +405,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="column is-half">
 
                     <?php
-                    $query = "SELECT * from post inner join user on post.created_by = user.id ORDER BY created_at DESC";
+                    $query = "SELECT p.id, p.content, p.created_at, p.created_by, u.role, u.username from post p inner join user u on p.created_by = u.id ORDER BY created_at DESC";
                     $stmt = $mysqli->prepare($query);
                     $stmt->execute();
                     $result=$stmt->get_result();
@@ -397,10 +425,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                         </div>
                         <footer class="card-footer">
                             <?php 
-                            if(isset($_SESSION['login']) && ($_SESSION['userid'] == $row['created_by'] || $_SESSION['userrole'] = 2))
+                            if(isset($_SESSION['login']) && ($_SESSION['userid'] == $row['created_by'] || $_SESSION['userrole'] == 2))
                             {
                             ?>
-                                <!-- <a href="#" class="card-footer-item">🗑️</a> -->
+                                <form name="deletePostForm" class="card-footer-item" method="post">
+                                    <input type="hidden" name="deleteId" value="<?php echo $row['id']; ?>"/>
+                                    <button name="deletePost" type="submit" class="button button is-small">🗑️</button>
+                                </form>
                             <?php } ?>
                         </footer>
                     </div>
