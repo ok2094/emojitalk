@@ -103,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     //CREATE POST
     if(isset($_POST["createPost"])){
-        if(isset($_POST['content']) && !empty(trim($_POST['content'])) && strlen(trim($_POST['content'])) <= 20){
+        if(isset($_POST['content']) && !empty(trim($_POST['content'])) && strlen(trim($_POST['content'])) <= 80){
             $content = htmlspecialchars(trim($_POST['content']));
         } else {
             $error .= "Please review your input";
@@ -388,7 +388,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="modal-card">
         <form name="postForm" method="post">
             <header class="modal-card-head">
-                <input name="content" pattern="[^a-zA-Z0-9 @.,_+-?!]*" maxlength="20" class="input is-rounded emojiinput"></input>
+                <input name="content" pattern="[^a-zA-Z0-9 @.,_+-?!]*" maxlength="0" class="input is-rounded emojiinput"></input>
             </header>
             <section class="modal-card-body">
                 <div class="field">
