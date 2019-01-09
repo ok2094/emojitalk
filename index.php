@@ -299,7 +299,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button name="register" type="submit" class="button is-success">Sign up!</button>
+                <input name="register" type="submit" class="button is-success" value="Sign up!">
             </footer>
         </form>
         </div>
@@ -336,7 +336,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button name="login" type="submit" class="button is-success">Login</button>
+                <input name="login" type="submit" class="button is-success" value="Login">
             </footer>
         </form>
         </div>
@@ -373,7 +373,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button name="changePwd" type="submit" class="button is-success">Confirm</button>
+                <input name="changePwd" type="submit" class="button is-success" value="Confirm">
             </footer>
         </form>
         </div>
@@ -396,7 +396,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button name="createPost" type="submit" class="button is-success">Submit</button>
+                <input name="createPost" type="submit" class="button is-success" value="Submit">
             </footer>
         </form>
         </div>
