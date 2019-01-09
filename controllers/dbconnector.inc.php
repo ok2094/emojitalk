@@ -1,7 +1,7 @@
 <?php
 $host = '127.0.0.1';
-$username = 'root';
-$password = '';
+$username = 'emojitalk_user';
+$password = 'emojitalk123';
 $database = 'emojitalk_beta';
 
 // mit Datenbank verbinden
