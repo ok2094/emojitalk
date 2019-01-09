@@ -1,7 +1,15 @@
+body {
+    background-color: rgb(255, 221, 159);
+}
+
 .emojipicker {
     height: 300px;
 }
 
 .emoji {
     font-size: 1.3em;
+}
+
+.card {
+    margin-bottom: 25px;
 }

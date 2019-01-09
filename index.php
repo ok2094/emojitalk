@@ -1,74 +1,66 @@
 <?php
 include('controllers/dbconnector.inc.php');
+session_start();
 
 $error = '';
-$message = '';
-
 
 // Formular wurde gesendet und Besucher ist noch nicht angemeldet.
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
-    echo "<script type='text/javascript'>alert('?');</script>";
 
+    //SIGN UP
     if(isset($_POST["register"])){
-
         if(isset($_POST['rEmail']) && !empty(trim($_POST['rEmail'])) && strlen(trim($_POST['rEmail'])) <= 100){
             $rEmail = htmlspecialchars(trim($_POST['rEmail']));
             // korrekte emailadresse?
             if (filter_var($rEmail, FILTER_VALIDATE_EMAIL) === false){
-              $error .= "Geben Sie bitte eine korrekte Email-Adresse ein<br />";
+              $error .= "Please enter a valid email";
             }
         } else {
-            // Ausgabe Fehlermeldung
-            $error .= "Geben Sie bitte eine korrekte Email-Adresse ein.<br />";
+            $error .= "Please enter a valid email";
         }
 
-        // benutzername vorhanden, mindestens 6 Zeichen und maximal 30 zeichen lang
-        if(isset($_POST['rUsername']) && !empty(trim($_POST['rUsername'])) && strlen(trim($_POST['rUsername'])) <= 30){
+        // benutzername check
+        if(isset($_POST['rUsername']) && !empty(trim($_POST['rUsername'])) && strlen(trim($_POST['rUsername'])) <= 30 && strlen(trim($_POST['rUsername'])) >= 3){
             $rUsername = trim($_POST['rUsername']);
         } else {
-            // Ausgabe Fehlermeldung
-            $error .= "Geben Sie bitte einen korrekten Benutzernamen ein.<br />";
+            $error .= "Please enter a valid username";
         }
 
         // passwort vorhanden, mindestens 8 Zeichen
-        if(isset($_POST['rPassword']) && !empty(trim($_POST['rPassword']))){
+        if(isset($_POST['rPassword']) && !empty(trim($_POST['rPassword'])) && strlen(trim($_POST['rPassword'])) >= 8 && strlen(trim($_POST['rPassword'])) <= 200){
             $rPassword = trim($_POST['rPassword']);
-            //entspricht das passwort unseren vorgaben? (minimal 8 Zeichen, Zahlen, Buchstaben, keine Zeilenumbrüche, mindestens ein Gross- und ein Kleinbuchstabe)
         } else {
-            // Ausgabe Fehlermeldung
-            $error .= "Geben Sie bitte einen korrekten Nachnamen ein.<br />";
+            $error .= "Please enter a valid password";
         }
 
-        echo($rEmail . ' ' . $rPassword . ' ' . $rUsername);
         // wenn kein Fehler vorhanden ist, schreiben der Daten in die Datenbank
         if(empty($error)){
             $rPassword = password_hash($rPassword, PASSWORD_DEFAULT);
             $query = "INSERT INTO user (role, username, password, email) VALUES (?,?,?,?)";
             $stmt = $mysqli->prepare($query);
-            $stmt->bind_param("isss", $rRole = 1, $rUsername, $rPassword, $rEmail);
+            $rRole = 1;
+            $stmt->bind_param("isss", $rRole, $rUsername, $rPassword, $rEmail);
             $stmt->execute();
             $stmt->close();
-            //header("Location: /login.php");
+
+            echo "<script type='text/javascript'>alert('Sign up successful');</script>";
         }
-    } else if(isset($_POST["login"])){
-        echo "<script type='text/javascript'>alert('dostuff');</script>";
+    } 
+
+    //LOGIN
+    if(isset($_POST["login"])){
         // username
         if(!empty(trim($_POST['logUsername']))){
-
             $username = trim($_POST['logUsername']);
-            
-            // prüfung benutzername
-            
         } else {
-            $error .= "Geben Sie bitte den Benutzername an.<br />";
+            $error .= "Please enter a username";
         }
+
         // password
         if(!empty(trim($_POST['logPassword']))){
             $password = trim($_POST['logPassword']);
-            // passwort gültig?
-            
         } else {
-            $error .= "Geben Sie bitte das Passwort an.<br />";
+            $error .= "Please enter a password";
         }
 
         // kein fehler
@@ -79,27 +71,85 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $stmt->execute();
             $result=$stmt->get_result();
             if($result->num_rows === 0) {
-                echo 'shit';
+                $error .= "User not found";
             }
             else {
                 while($row = $result->fetch_assoc()){
                     if(password_verify($password, $row['password'])){
-                        session_start();
                         $_SESSION['login'] = true;
-                        $_SESSION['username'] = $row['username'];
-                        header("Location: /index.php");
-                        echo "<script type='text/javascript'>alert('login');</script>";
+                        $_SESSION['userid'] = $row['id'];
+                        $_SESSION['userrole'] = $row['role'];
                     }
                     else{
-                        echo "<script type='text/javascript'>alert('idk');</script>";
+                        $error .= "Password wrong";
                     }
                 }
             }
 
             $result->free();
             $stmt->close();
-            // header("Location: /index.php");
         }
+    }
+
+    //CREATE POST
+    if(isset($_POST["createPost"])){
+        if(isset($_POST['content']) && !empty(trim($_POST['content'])) && strlen(trim($_POST['content'])) <= 20){
+            $content = trim($_POST['content']);
+        } else {
+            $error .= "Please enter an emoji";
+        }
+
+        // wenn kein Fehler vorhanden ist, schreiben der Daten in die Datenbank
+        if(empty($error)){
+            $query = "INSERT INTO post (content, created_at, created_by) VALUES (?,now(),?)";
+            $stmt = $mysqli->prepare($query);
+            $stmt->bind_param("ss", $content, $_SESSION['userid']);
+            $stmt->execute();
+            $stmt->close();
+        }
+    }
+
+    if(isset($_POST["changePwd"])){
+        if(isset($_POST['oldPwd']) && !empty(trim($_POST['oldPwd'])) && strlen(trim($_POST['oldPwd'])) <= 200){
+            $oldPwd = trim($_POST['oldPwd']);
+            $query = "SELECT * from user where id = ?";
+            $stmt = $mysqli->prepare($query);
+            $stmt->bind_param("i", $_SESSION['userid']);
+            $stmt->execute();
+            $result=$stmt->get_result();
+            if($result->num_rows === 0) {
+                $error .= "User not found";
+            } else {
+                while($row = $result->fetch_assoc()){
+                    if(password_verify($oldPwd, $row['password'])){
+                        if(isset($_POST['newPwd']) && !empty(trim($_POST['newPwd'])) && strlen(trim($_POST['newPwd'])) >= 8 && strlen(trim($_POST['newPwd'])) <= 200){
+                            $newPwd = trim($_POST['newPwd']);
+                            $newPwd = password_hash($newPwd, PASSWORD_DEFAULT);
+                            $query = "UPDATE user SET password = ? WHERE id = ?";
+                            $stmt = $mysqli->prepare($query);
+                            $stmt->bind_param("si", $newPwd, $_SESSION['userid']);
+                            $stmt->execute();
+                            $stmt->close();
+
+                            echo "<script type='text/javascript'>alert('Password change successful');</script>";
+                        } else {
+                            $error .= "Please enter a valid new password";
+                        }
+                    }
+                    else{
+                        $error .= "Password wrong";
+                    }
+                }
+            }
+            $result->free();
+        } else {
+            $error .= "Please enter your current password";
+        }
+    }
+
+    //ERROR MESSAGE
+    if(!empty($error)) {
+        echo "<script type='text/javascript'>alert('$error');</script>";
     }
 }
 ?>
@@ -115,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
     <link rel="stylesheet" href="stylesheets/main.css">
 
-    <title>😜Emojitalk</title>
+    <title>Emojitalk😜</title>
 </head>
 
 <body class="has-navbar-fixed-top has-navbar-fixed-bottom">
@@ -123,7 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     <nav id="mainNav" class="navbar is-fixed-top is-warning" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="index.php">
-                <h2>Emojitalk😜</h2>
+                <h2><strong>Emojitalk😜</strong></h2>
             </a>
 
             <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -133,18 +183,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             </a>
         </div>
 
-        <div id="navbarBasicExample" class="navbar-menu">
+        <div id="navbarBasic" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item">
-                    Feed
-                </a>
             </div>
 
             <div class="navbar-end">
                 <div class="navbar-item">
                     <div class="buttons">
                         <?php
-                        if (!$_SESSION['login']) {
+                        if (!isset($_SESSION['login'])) {
                         ?>
                         <a id="btnRegister" class="button is-primary">
                             <strong>Sign up</strong>
@@ -155,6 +202,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                         <?php
                         } else {
                         ?>
+                        <a id="btnChangePwd" class="button is-danger">
+                            Change Password
+                        </a>
                         <a href="controllers/logout.php" class="button is-light">
                             Log out
                         </a>
@@ -180,7 +230,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="field">
                     <label class="label" for="regUsername">Username</label>
                     <div class="control has-icons-left">
-                        <input name="rUsername" id="regUsername" class="input" type="text">
+                        <input name="rUsername" id="regUsername" class="input" type="text" maxlength="30" minlength="3" required>
                         <span class="icon is-small is-left">
                             <i class="fas fa-user"></i>
                         </span>
@@ -190,7 +240,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="field">
                     <label class="label" for="regEmail">Email</label>
                     <div class="control has-icons-left">
-                        <input name="rEmail" id="regEmail" class="input" type="email">
+                        <input name="rEmail" id="regEmail" class="input" type="email" maxlength="100" required>
                         <span class="icon is-small is-left">
                             <i class="fas fa-envelope"></i>
                         </span>
@@ -200,7 +250,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="field">
                     <label class="label" for="regPassword">Password</label>
                     <div class="control has-icons-left">
-                        <input name="rPassword" id="regPassword" class="input" type="password">
+                        <input name="rPassword" id="regPassword" class="input" type="password" maxlength="200" minlength="8" required>
                         <span class="icon is-small is-left">
                             <i class="fas fa-key"></i>
                         </span>
@@ -227,7 +277,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="field">
                     <label class="label" for="logUsername">Username</label>
                     <div class="control has-icons-left">
-                        <input name="logUsername" id="logUsername" class="input" type="text">
+                        <input name="logUsername" id="logUsername" class="input" type="text" maxlength="30" required>
                         <span class="icon is-small is-left">
                             <i class="fas fa-user"></i>
                         </span>
@@ -237,7 +287,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="field">
                     <label class="label" for="logPassword">Password</label>
                     <div class="control has-icons-left">
-                        <input name="logPassword" id="logPassword" class="input" type="password">
+                        <input name="logPassword" id="logPassword" class="input" type="password" maxlength="200" required>
                         <span class="icon is-small is-left">
                             <i class="fas fa-key"></i>
                         </span>
@@ -251,18 +301,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
     </div>
 
+    <!-- Change Password Modal -->
+    <div id="changePwdModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+        <form name="changePwdForm" method="post">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Change Password</p>
+                <button class="delete exitmodal" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="field">
+                    <label class="label" for="oldPwd">Current Password</label>
+                    <div class="control has-icons-left">
+                        <input name="oldPwd" id="oldPwd" class="input" type="password" maxlength="200" required>
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-key"></i>
+                        </span>
+                    </div>
+                </div>
 
-    <?php
-    if ($_SESSION['login']) {
-    ?>
+                <div class="field">
+                    <label class="label" for="newPwd">New Password</label>
+                    <div class="control has-icons-left">
+                        <input name="newPwd" id="newPwd" class="input" type="password" maxlength="200" minlength="8" required>
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-key"></i>
+                        </span>
+                    </div>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button name="changePwd" type="submit" class="button is-success">Confirm</button>
+            </footer>
+        </form>
+        </div>
+    </div>
+
     <!-- Post Modal -->
     <div id="postModal" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
         <form name="postForm" method="post">
             <header class="modal-card-head">
-                <label class="input emojiinput"></label>
-                <button class="delete exitmodal" aria-label="close"></button>
+                <input name="content" pattern="[^a-zA-Z0-9 @.,_+-?!]*" maxlength="20" class="input emojiinput"></input>
             </header>
             <section class="modal-card-body">
                 <div class="field">
@@ -275,9 +357,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         </form>
         </div>
     </div>
-    <?php
-    }
-    ?>
 
     <!-- Main Section -->
     <section class="section">
@@ -288,39 +367,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 <div class="column is-half">
 
                     <?php
-
+                    $query = "SELECT * from post inner join user on post.created_by = user.id ORDER BY created_at DESC";
+                    $stmt = $mysqli->prepare($query);
+                    $stmt->execute();
+                    $result=$stmt->get_result();
+                    while($row = $result->fetch_assoc()){
                     ?>
                     <!-- Post -->
                     <div class="card">
                         <header class="card-header">
                             <p class="card-header-title">
-                                User
+                                <?php echo $row['username']; ?>
                             </p>
                         </header>
                         <div class="card-content">
                             <div class="content">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.
+                                <?php echo $row['content']; ?>
                             </div>
                         </div>
                         <footer class="card-footer">
-                            <a href="#" class="card-footer-item">🗑️</a>
+                            <?php 
+                            if(isset($_SESSION['login']) && ($_SESSION['userid'] == $row['created_by'] || $_SESSION['userrole'] = 2))
+                            {
+                            ?>
+                                <!-- <a href="#" class="card-footer-item">🗑️</a> -->
+                            <?php } ?>
                         </footer>
                     </div>
-
-                    <!-- Emoji Input -->
-                    <!-- <div class="field has-addons">
-                        <div class="control">
-                            <label class="input">Test</label>
-                        </div>
-                        <p class="control">
-                            emojikeyboard toggle something
-                        </p>
-                        <div class="control">
-                            <a class="button is-primary">
-                                Post
-                            </a>
-                        </div>
-                    </div> -->
+                    <?php
+                    }
+        
+                    $result->free();
+                    $stmt->close();
+                    ?>
+                    
 
                 </div>
 
@@ -330,17 +410,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     </section>
 
     <!-- Footer -->
-    <nav class="navbar is-fixed-bottom is-success">
+    <nav class="navbar is-fixed-bottom is-warning">
         <div class="navbar-menu is-active level">
-        <?php
-        if ($_SESSION['login']) {
-        ?>
+            <?php
+            if (isset($_SESSION['login'])) {
+            ?>
             <div id="createPost" class="dropdown is-up level-item has-text-centered">
-                <button id="btnCreatePost" class="button is-primary">Create Post</button>
+                <button id="btnCreatePost" class="button is-success">Create Post</button>
             </div>
-        <?php
-        }
-        ?>
+            <?php
+            }
+            ?>
         </div>
     </nav>
 

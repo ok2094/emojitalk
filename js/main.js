@@ -25,6 +25,9 @@ $(function () {
     $("#btnLogin").click(function () {
         $("#loginModal").addClass("is-active");
     });
+    $("#btnChangePwd").click(function () {
+        $("#changePwdModal").addClass("is-active");
+    });
     $(".modal-background").click(function () {
         $(".modal").removeClass("is-active");
     });
@@ -32,7 +35,7 @@ $(function () {
         $(".modal").removeClass("is-active");
     });
     $(document).on('click', '.emoji', function () {
-        $(".emojiinput").append($(this).text());
+        $(".emojiinput").val($(".emojiinput").val() + $(this).text());
     })
 
     // RUN STUFF //
