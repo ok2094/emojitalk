@@ -1,10 +1,6 @@
-html {
-    min-height: 100%;
-}
-
 body {
     background-color: rgb(255, 221, 159);
-    min-height: 100%;
+    min-height: 100vh;
 }
 
 .emojipicker {
