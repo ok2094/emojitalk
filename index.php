@@ -122,7 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 $error .= "Post not found";
             } else {
                 while($row = $result->fetch_assoc()){ 
-                    if($row['created_by'] == $_SESSION['userid']) {
+                    if($row['created_by'] == $_SESSION['userid'] || $_SESSION['userrole'] == 2) {
                         $query = "DELETE FROM post WHERE id = ?";
                         $stmt = $mysqli->prepare($query);
                         $stmt->bind_param("i", $deleteId);
