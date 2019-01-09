@@ -1,8 +1,3 @@
 # emojitalk
 
-todo
-test plan
-doku
-
-Fragen
-B3
+shitty ass social platform
