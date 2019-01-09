@@ -13,3 +13,7 @@ body {
 .card {
     margin-bottom: 25px;
 }
+
+.card-content {
+    font-size: 1.8em;
+}
