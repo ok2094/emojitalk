@@ -36,7 +36,10 @@ $(function () {
     });
     $(document).on('click', '.emoji', function () {
         $(".emojiinput").val($(".emojiinput").val() + $(this).text());
-    })
+    });
+    $(".emojiinput").change(function () {
+        $(".emojiinput").val($(".emojiinput").val());
+    });
 
     // RUN STUFF //
     initializeEmojipicker();
