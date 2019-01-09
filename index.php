@@ -34,15 +34,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
         // wenn kein Fehler vorhanden ist, schreiben der Daten in die Datenbank
         if(empty($error)){
-            $rPassword = password_hash($rPassword, PASSWORD_DEFAULT);
-            $query = "INSERT INTO user (role, username, password, email) VALUES (?,?,?,?)";
+            $query = "SELECT * from user where username = ?";
             $stmt = $mysqli->prepare($query);
-            $rRole = 1;
-            $stmt->bind_param("isss", $rRole, $rUsername, $rPassword, $rEmail);
+            $stmt->bind_param("s", $rUsername);
             $stmt->execute();
-            $stmt->close();
+            $result=$stmt->get_result();
+            if($result->num_rows === 0) {
+                $rPassword = password_hash($rPassword, PASSWORD_DEFAULT);
+                $query = "INSERT INTO user (role, username, password, email) VALUES (?,?,?,?)";
+                $stmt = $mysqli->prepare($query);
+                $rRole = 1;
+                $stmt->bind_param("isss", $rRole, $rUsername, $rPassword, $rEmail);
+                $stmt->execute();
 
-            echo "<script type='text/javascript'>alert('Sign up successful');</script>";
+                echo "<script type='text/javascript'>alert('Sign up successful');</script>";
+            }
+            else {
+                $error .= "Username taken";
+            }
+            $stmt->close();
         }
     } 
 
@@ -99,7 +109,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $error .= "Please review your input";
         }
 
-        // wenn kein Fehler vorhanden ist, schreiben der Daten in die Datenbank
         if(empty($error)){
             $query = "INSERT INTO post (content, created_at, created_by) VALUES (?,now(),?)";
             $stmt = $mysqli->prepare($query);
