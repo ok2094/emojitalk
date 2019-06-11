@@ -1,3 +1,6 @@
 # emojitalk
 
-shitty ass social platform
+social media platform for emojis.
+
+
+School Project for Module 151.
